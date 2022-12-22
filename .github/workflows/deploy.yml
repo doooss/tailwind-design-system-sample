@@ -1,0 +1,23 @@
+name: push to prod
+on:
+  release:
+    types: [published]
+jobs:
+  push:
+    runs-on: ubuntu-latest
+
+    steps:      
+      - name: Get Latest release tag
+        id: last_release
+        uses: InsonusK/get-latest-release@v1.0.1
+        with:
+          myToken: ${{ github.TOKEN }}
+          exclude_types: prerelease, draft
+          view_top: 1
+      - uses: actions/checkout@v3
+        with:
+          ref: prod
+          fetch-depth: 0
+
+      - run : git reset --hard ${{ steps.last_release.outputs.tag_name }}
+      - run : git push -f
